@@ -31,7 +31,7 @@ function Layout({ children }) {
             <NavBar />
             <main style={mainStyle}>{children}</main>
             <footer style={footerStyle}>
-                <p>&copy; 2024 My Shopping List App-Task10</p>
+                <p style={{color:"yellow"}}>&copy; 2024 My Shopping List App-Task10</p>
             </footer>
         </div>
     );

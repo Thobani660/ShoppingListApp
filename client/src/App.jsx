@@ -4,6 +4,7 @@ import Home from './pages/homePage';
 import SignIn from './pages/signIn';
 import SignUp from './components/signIn';
 import ShoppingList from './pages/shoppingList';
+import Nopage from './pages/noPage';
 import Layout from './pages/layout';
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
                     <Route path="/signin" element={<SignIn />} />
                     <Route path="/signup" element={<SignUp />} />
                     <Route path="/shoppinglist" element={<ShoppingList />} />
+                    <Route path="*" element={<Nopage />} />
                 </Routes>
             </Layout>
         </Router>
