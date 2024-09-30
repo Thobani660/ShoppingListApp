@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addList, removeList } from '../feature/shoppingList/shoppingListSlice'; // Import the actions
 
@@ -14,6 +14,23 @@ function ShoppingList() {
     const lists = useSelector((state) => state.shoppingList); // Access the Redux state
     const dispatch = useDispatch(); // Get the dispatch function
 
+    // Load data from local storage
+    useEffect(() => {
+        const storedLists = JSON.parse(localStorage.getItem('shoppingLists'));
+        if (storedLists) {
+            storedLists.forEach(list => dispatch(addList(list)));
+        }
+    }, [dispatch]);
+
+    // Save data to local storage
+    const saveToLocalStorage = () => {
+        const listsToSave = lists.map((list, index) => ({
+            ...list,
+            todos: todoList // Include the todo list in the saved data
+        }));
+        localStorage.setItem('shoppingLists', JSON.stringify(listsToSave));
+    };
+
     // Open the modal
     const openModal = () => {
         setIsModalOpen(true);
@@ -26,11 +43,18 @@ function ShoppingList() {
         setCategory('Clothes');
     };
 
+    // Show alert message for button clicks
+    const showAlert = (message) => {
+        alert(message);
+    };
+
     // Handle form submission to add a new list
     const handleAddList = () => {
         if (listName) {
             dispatch(addList({ name: listName, category })); // Dispatch the action
+            showAlert('Added new list: ' + listName); // Show alert
             closeModal();
+            saveToLocalStorage(); // Save to local storage
         }
     };
 
@@ -38,19 +62,24 @@ function ShoppingList() {
     const handleAddTodo = () => {
         if (todoItem) {
             setTodoList((prev) => [...prev, todoItem]); // Add todo item to the list
+            showAlert('Added todo item: ' + todoItem); // Show alert
             setTodoItem(''); // Reset input
+            saveToLocalStorage(); // Save to local storage
         }
     };
 
     // Handle removing a Todo item
     const handleRemoveTodo = (index) => {
+        showAlert('Removed todo item: ' + todoList[index]); // Show alert
         setTodoList((prev) => prev.filter((_, i) => i !== index)); // Remove todo item
+        saveToLocalStorage(); // Save to local storage
     };
 
     // Handle starting to edit a Todo item
     const handleEditTodo = (index) => {
         setEditingTodoIndex(index);
         setEditTodoValue(todoList[index]); // Set the current value to the edit input
+        showAlert('Editing todo item: ' + todoList[index]); // Show alert
     };
 
     // Handle saving the edited Todo item
@@ -61,8 +90,10 @@ function ShoppingList() {
                 newTodos[editingTodoIndex] = editTodoValue; // Update the edited todo item
                 return newTodos;
             });
+            showAlert('Saved edit for todo item: ' + editTodoValue); // Show alert
             setEditingTodoIndex(null); // Reset editing state
             setEditTodoValue(''); // Reset input
+            saveToLocalStorage(); // Save to local storage
         }
     };
 
@@ -71,6 +102,7 @@ function ShoppingList() {
         setEditingTodoIndex(null); // Reset editing state
         setEditTodoValue(''); // Reset input
         setCurrentList(null); // Go back to list view
+        showAlert('Canceled editing todo item'); // Show alert
     };
 
     // Handle clicking a list card to edit the list
@@ -78,6 +110,14 @@ function ShoppingList() {
         setCurrentList(index);
         setTodoList([]); // Reset todo list for new selection
         setIsModalOpen(false); // Close list creation modal
+        showAlert('Viewing todo list: ' + lists[index].name); // Show alert
+    };
+
+    // Handle deleting a shopping list
+    const handleDeleteList = (index) => {
+        showAlert('Deleted shopping list: ' + lists[index].name); // Show alert
+        dispatch(removeList(index)); // Dispatch the action to remove the list
+        saveToLocalStorage(); // Save to local storage
     };
 
     return (
@@ -209,73 +249,63 @@ function ShoppingList() {
                                             value={editTodoValue}
                                             onChange={(e) => setEditTodoValue(e.target.value)}
                                             style={{
-                                                flex: 1,
-                                                marginRight: '5px',
+                                                width: '70%',
                                                 padding: '5px',
                                                 borderRadius: '4px',
                                                 border: '1px solid purple',
                                             }}
                                         />
-                                        <button onClick={handleSaveEdit} style={{ backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', padding: '5px' }}>
+                                        <button onClick={handleSaveEdit} style={{ marginLeft: '5px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
                                             Save
+                                        </button>
+                                        <button onClick={handleCancelEdit} style={{ marginLeft: '5px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+                                            Cancel
                                         </button>
                                     </>
                                 ) : (
                                     <>
                                         <span>{item}</span>
-                                        <button onClick={() => handleEditTodo(index)} style={{ backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', padding: '5px' }}>
-                                            Edit
-                                        </button>
+                                        <div>
+                                            <button onClick={() => handleEditTodo(index)} style={{ marginLeft: '5px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+                                                Edit
+                                            </button>
+                                            <button onClick={() => handleRemoveTodo(index)} style={{ marginLeft: '5px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+                                                Remove
+                                            </button>
+                                        </div>
                                     </>
                                 )}
-                                <button
-                                    onClick={() => handleRemoveTodo(index)}
-                                    style={{
-                                        backgroundColor: '#dc3545',
-                                        color: 'white',
-                                        border: 'none',
-                                        borderRadius: '4px',
-                                        cursor: 'pointer',
-                                        padding: '5px',
-                                    }}
-                                >
-                                    Remove
-                                </button>
                             </div>
                         ))
                     )}
-                    <button onClick={handleCancelEdit} style={{ backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', padding: '5px', marginLeft: '5px' }}>
-                        Cancel
+
+                    <button onClick={handleCancelEdit} style={{ marginTop: '20px', backgroundColor: '#ffc107', color: 'black', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+                        Back to Lists
+                    </button>
+
+                    <button onClick={() => handleDeleteList(currentList)} style={{ marginTop: '20px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+                        Delete List
                     </button>
                 </div>
             )}
 
-            {/* List Cards */}
-            <div
-                style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(3, 1fr)',
-                    gap: '20px',
-                    marginTop: '20px',
-                }}
-            >
-                {lists.map((list, index) => (
-                    <div
-                        key={index}
-                        onClick={() => handleListClick(index)} // Handle click to view Todo list
-                        style={{
-                            padding: '20px',
-                            border: '1px solid purple',
-                            borderRadius: '8px',
-                            textAlign: 'center',
-                            cursor: 'pointer',
-                            transition: '0.3s',
-                        }}
-                    >
-                        <h3>{list.name}</h3>
-                        <p>Category: {list.category}</p>
-                    </div>
-                ))}
+            {/* Display the shopping lists */}
+            <div style={{ marginTop: '20px' }}>
+                <h3>Your Shopping Lists:</h3>
+                {lists.length === 0 ? (
+                    <p>No shopping lists available.</p>
+                ) : (
+                    lists.map((list, index) => (
+                        <div key={index} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+                            <div onClick={() => handleListClick(index)} style={{ cursor: 'pointer', padding: '10px', border: '1px solid purple', borderRadius: '4px', backgroundColor: '#f8f9fa' }}>
+                                {list.name} - {list.category}
+                            </div>
+                            <button onClick={() => handleDeleteList(index)} style={{ marginLeft: '10px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+                                Delete
+                            </button>
+                        </div>
+                    ))
+                )}
             </div>
         </div>
     );
