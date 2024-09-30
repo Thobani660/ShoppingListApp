@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { addList } from '../feature/shoppingList/shoppingListSlice'; // Import the action
 
 function ShoppingList() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [listName, setListName] = useState('');
     const [category, setCategory] = useState('Clothes');
-    const [lists, setLists] = useState([]);
+    const lists = useSelector((state) => state.shoppingList); // Access the Redux state
+    const dispatch = useDispatch(); // Get the dispatch function
 
     // Open the modal
     const openModal = () => {
@@ -21,7 +24,7 @@ function ShoppingList() {
     // Handle form submission to add a new list
     const handleAddList = () => {
         if (listName) {
-            setLists([...lists, { name: listName, category }]);
+            dispatch(addList({ name: listName, category })); // Dispatch the action
             closeModal();
         }
     };
@@ -46,10 +49,9 @@ function ShoppingList() {
                         borderRadius: '8px',
                         boxShadow: '0.5px 0.5px 3px 2px grey',
                         zIndex: 1000,
-                        alignItems:"center",
+                        alignItems: "center",
                         justifyContent: "center",
-                        // border:"purple",
-                        padding:"30px"
+                        padding: "30px"
                     }}
                 >
                     <h2>Create New List</h2>
@@ -95,7 +97,6 @@ function ShoppingList() {
                             border: 'none',
                             borderRadius: '4px',
                             cursor: 'pointer',
-                            
                         }}
                     >
                         Add List
@@ -128,19 +129,19 @@ function ShoppingList() {
                 }}
             >
                 {lists.map((list, index) => (
-                 <div
-                 key={index}
-                 style={{
-                   padding: '20px',
-                   backgroundColor: '#f8f9fa',
-                   border: 'none',
-                   borderLeft: '2px solid grey',
-                   borderBottom: '2px solid grey',
-                   borderRadius: '10px',
-                   boxShadow: '0.5px 0.5px 3px 2px grey',
-                   width:"100px"
-                 }}
-               >
+                    <div
+                        key={index}
+                        style={{
+                            padding: '20px',
+                            backgroundColor: '#f8f9fa',
+                            border: 'none',
+                            borderLeft: '2px solid grey',
+                            borderBottom: '2px solid grey',
+                            borderRadius: '10px',
+                            boxShadow: '0.5px 0.5px 3px 2px grey',
+                            width: "100px"
+                        }}
+                    >
                         <h3>{list.name}</h3>
                         <p>{list.category}</p>
                     </div>
