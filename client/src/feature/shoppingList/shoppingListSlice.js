@@ -1,20 +1,24 @@
-// src/shoppingListSlice.js
 import { createSlice } from '@reduxjs/toolkit';
-import { loadListsFromLocalStorage, saveListsToLocalStorage } from './localStorage';
 
 const shoppingListSlice = createSlice({
     name: 'shoppingList',
-    initialState: loadListsFromLocalStorage(),
+    initialState: [],
     reducers: {
         addList: (state, action) => {
-            state.push(action.payload);
-            saveListsToLocalStorage(state);
+            state.push(action.payload); // Add the new list
         },
-        clearLists: (state) => {
-            return [];
+        removeList: (state, action) => {
+            return state.filter((list, index) => index !== action.payload); // Remove list by index
+        },
+        updateList: (state, action) => {
+            const { index, updatedList } = action.payload;
+            state[index] = updatedList; // Update the specific list
         },
     },
 });
 
-export const { addList, clearLists } = shoppingListSlice.actions;
+// Export actions
+export const { addList, removeList, updateList } = shoppingListSlice.actions;
+
+// Export the reducer
 export default shoppingListSlice.reducer;
