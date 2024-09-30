@@ -44,7 +44,7 @@ function Home(){
 const styles = {
 container: {
     fontFamily: 'Arial, sans-serif',
-    backgroundColor: '#f9f9f9',
+    backgroundColor: 'transparent',
     color: '#333',
     textAlign: 'center',
     padding: '20px',
