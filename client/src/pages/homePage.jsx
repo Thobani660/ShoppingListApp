@@ -79,6 +79,7 @@ features: {
 featuresTitle: {
     fontSize: '28px',
     margin: '20px 0',
+    color:'white'
 },
 featuresContainer: {
     display: 'flex',

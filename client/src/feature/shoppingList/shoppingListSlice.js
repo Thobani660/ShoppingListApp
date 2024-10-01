@@ -5,14 +5,14 @@ const shoppingListSlice = createSlice({
     initialState: [],
     reducers: {
         addList: (state, action) => {
-            state.push(action.payload); // Add the new list
+            state.push(action.payload);
         },
         removeList: (state, action) => {
-            return state.filter((list, index) => index !== action.payload); // Remove list by index
+            return state.filter((list, index) => index !== action.payload);
         },
         updateList: (state, action) => {
             const { index, updatedList } = action.payload;
-            state[index] = updatedList; // Update the specific list
+            state[index] = updatedList; 
         },
     },
 });

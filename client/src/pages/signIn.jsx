@@ -1,50 +1,56 @@
 import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { signInUser } from '../feature/auth/authSlice';
 
 function SignInForm() {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const dispatch = useDispatch();
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        // Here you can add your login logic (e.g., API call)
-        if (!email || !password) {
-            setError('Please fill in all fields');
-        } else {
-            setError('');
-            console.log('Submitted:', { email, password });
-            // Add your sign-in logic here (e.g., API call)
-        }
-    };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!email || !password) {
+      setError('Please fill in all fields');
+    } else {
+      dispatch(signInUser({ email, password }));
+      if (isAuthenticated) {
+        alert('Successfully signed in');
+      } else {
+        setError('Invalid email or password');
+      }
+    }
+  };
 
-    return (
-        <div style={styles.container}>
-            <h2 style={styles.header}>Sign In</h2>
-            {error && <p style={styles.error}>{error}</p>}
-            <form onSubmit={handleSubmit} style={styles.form}>
-                <input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    style={styles.input}
-                />
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    style={styles.input}
-                />
-                <button type="submit" style={styles.button}>
-                    Sign In
-                </button>
-            </form>
-            <p style={styles.footer}>
-                Don't have an account? <a href="/signup" style={styles.link}>Sign Up</a>
-            </p>
-        </div>
-    );
+  return (
+    <div style={styles.container}>
+      <h2 style={styles.header}>Sign In</h2>
+      {error && <p style={styles.error}>{error}</p>}
+      <form onSubmit={handleSubmit} style={styles.form}>
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          style={styles.input}
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          style={styles.input}
+        />
+        <button type="submit" style={styles.button}>
+          Sign In
+        </button>
+      </form>
+      <p style={styles.footer}>
+        Don't have an account? <a href="/signup" style={styles.link}>Sign Up</a>
+      </p>
+    </div>
+  );
 }
 
 const styles = {
