@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-// import { registerUser } from './authSlice';
+import { registerUser } from '../feature/auth/authSlice'; // Uncommented
 
 function SignUpForm() {
   const [username, setUsername] = useState('');
@@ -15,8 +15,9 @@ function SignUpForm() {
       setError('Please fill in all fields');
     } else {
       setError('');
-      dispatch(registerUser({ username, email, password }));
-      alert('Successfully registered');
+      dispatch(registerUser({ username, email, password }))
+        .then(() => alert('Successfully registered'))
+        .catch(() => setError('Registration failed, please try again'));
     }
   };
 
@@ -57,61 +58,61 @@ function SignUpForm() {
   );
 }
 
-    const styles = {
-        container: {
-            width: '300px',
-            margin: '50px auto',
-            padding: '20px',
-            borderRadius: '10px',
-            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
-            backgroundColor: '#fff',
-            textAlign: 'center',
-        },
-        header: {
-            marginBottom: '20px',
-            fontSize: '24px',
-            color: '#333',
-        },
-        form: {
-            display: 'flex',
-            flexDirection: 'column',
-        },
-        input: {
-            marginBottom: '15px',
-            padding: '10px',
-            borderRadius: '5px',
-            border: '1px solid #ccc',
-            fontSize: '16px',
-            outline: 'none',
-            transition: 'border-color 0.3s',
-        },
-        button: {
-            padding: '10px',
-            borderRadius: '5px',
-            border: 'none',
-            backgroundColor: '#007bff',
-            color: 'white',
-            fontSize: '16px',
-            cursor: 'pointer',
-            transition: 'background-color 0.3s',
-        },
-        buttonHover: {
-            backgroundColor: '#0056b3',
-        },
-        error: {
-            color: 'red',
-            marginBottom: '10px',
-        },
-        footer: {
-            marginTop: '20px',
-            fontSize: '14px',
-            color: '#777',
-        },
-        link: {
-            color: '#007bff',
-            textDecoration: 'none',
-        },
+const styles = {
+  container: {
+    width: '300px',
+    margin: '50px auto',
+    padding: '20px',
+    borderRadius: '10px',
+    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
+    backgroundColor: '#fff',
+    textAlign: 'center',
+  },
+  header: {
+    marginBottom: '20px',
+    fontSize: '24px',
+    color: '#333',
+  },
+  form: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  input: {
+    marginBottom: '15px',
     
+    padding: '10px',
+    borderRadius: '5px',
+    border: '1px solid #ccc',
+    fontSize: '16px',
+    outline: 'none',
+    transition: 'border-color 0.3s',
+  },
+  button: {
+    padding: '10px',
+    borderRadius: '5px',
+    border: 'none',
+    backgroundColor: '#007bff',
+    color: 'white',
+    fontSize: '16px',
+    cursor: 'pointer',
+    transition: 'background-color 0.3s',
+  },
+  buttonHover: {
+    backgroundColor: '#0056b3',
+  },
+  error: {
+    color: 'red',
+    marginBottom: '10px',
+  },
+  footer: {
+    marginTop: '20px',
+    fontSize: '14px',
+    color: '#777',
+  },
+  link: {
+    color: '#007bff',
+    textDecoration: 'none',
+  },
 };
 
 export default SignUpForm;

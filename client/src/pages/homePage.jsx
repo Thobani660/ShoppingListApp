@@ -7,6 +7,7 @@ function Home(){
             <button style={styles.button} onClick={() => alert('Get Started!')}>
                 Get Started
             </button>
+            
         </header>
 
         <section style={styles.features}>

@@ -13,7 +13,9 @@ const shoppingListSlice = createSlice({
         updateList: (state, action) => {
             const { index, updatedList } = action.payload;
             state[index] = updatedList; 
-        },
+        }, clearAllLists: (state) => {
+            return []; // Clear all lists by returning an empty array
+          },
     },
 });
 

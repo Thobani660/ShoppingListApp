@@ -17,7 +17,9 @@ function ShoppingList() {
 
   // Function to clear all lists
   const clearAllLists = () => {
-    setList([]); // Sets the lists to an empty array, effectively clearing them
+    dispatch({ type: 'shoppingList/clearAllLists' }); // Dispatch an action to clear all lists
+    showAlert("Cleared all shopping lists"); // Show alert
+    saveToLocalStorage(); // Update local storage
   };
   // Load data from local storage
   useEffect(() => {
@@ -133,6 +135,61 @@ function ShoppingList() {
       </button>
       <input type="text" placeholder="Search" style={{ marginLeft: "620px",padding:"15px",width:"300px",borderRadius:"15px" }} />
 
+      {/* Apply blur effect to the background when modal is open */}
+      <div style={{ filter: isModalOpen || currentList !== null ? "blur(5px)" : "none" }}>
+        {/* Display the shopping lists */}
+        <div style={{ marginTop: "20px" }}>
+          <h3 style={{ color: "white" }}>Your Shopping Lists:</h3>
+          <button
+            onClick={clearAllLists} // Add onClick to the Clear All button
+            style={{
+              padding: "20px",
+              backgroundColor: "red",
+              color: "white",
+              borderRadius: "10px",
+              border: "2px solid transparent",
+              cursor: "pointer",
+            }}
+          >
+            Clear All
+          </button>
+
+          {lists.length === 0 ? (
+            <p>No shopping lists available.</p>
+          ) : (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(4, 1fr)", // Four equal columns
+                gap: "10px", // Space between items
+                marginTop: "10px", // Added space above grid items
+              }}
+            >
+              {lists.map((list, index) => (
+                <div
+                  key={index}
+                  onClick={() => handleListClick(index)}
+                  style={{
+                    cursor: "pointer",
+                    height: "100px",
+                    width: "100px",
+                    padding: "10px",
+                    border: "2px solid orange",
+                    borderRadius: "4px",
+                    backgroundColor: "#f8f9fa",
+                    textAlign: "center",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  {list.name} - {list.category}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Modal for Adding New List */}
       {isModalOpen && (
         <div
@@ -160,10 +217,9 @@ function ShoppingList() {
               marginBottom: "10px",
               padding: "8px",
               borderRadius: "4px",
-              border: "1px solid purple",
+              border: "1px solid lightgreen",
             }}
           />
-
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
@@ -173,32 +229,46 @@ function ShoppingList() {
               marginBottom: "10px",
               padding: "8px",
               borderRadius: "4px",
-              border: "1px solid purple",
+              border: "1px solid lightgreen",
             }}
           >
             <option value="Clothes">Clothes</option>
-            <option value="Shoes">Shoes</option>
+            <option value="Gadgets">Gadgets</option>
             <option value="Food">Food</option>
-            <option value="Furniture">Furniture</option>
+            <option value="Other">Other</option>
           </select>
-
           <button
             onClick={handleAddList}
             style={{
+              backgroundColor: "lightgreen",
               padding: "10px",
-              backgroundColor: "#28a745",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
+              borderRadius: "10px",
+              border: "1px solid transparent",
+              width: "100%",
               cursor: "pointer",
             }}
           >
             Add List
           </button>
+          <button
+            onClick={closeModal}
+            style={{
+              marginTop: "10px",
+              backgroundColor: "red",
+              color: "white",
+              padding: "10px",
+              borderRadius: "10px",
+              border: "1px solid transparent",
+              width: "100%",
+              cursor: "pointer",
+            }}
+          >
+            Cancel
+          </button>
         </div>
       )}
 
-      {/* Todo List Modal */}
+      {/* Todo list for the selected list */}
       {currentList !== null && (
         <div
           style={{
@@ -213,227 +283,141 @@ function ShoppingList() {
             zIndex: 1000,
           }}
         >
-          <h2>{lists[currentList]?.name} - Todo List</h2>
-          <input
-            type="text"
-            placeholder="Add Todo Item"
-            value={todoItem}
-            onChange={(e) => setTodoItem(e.target.value)}
-            style={{
-              display: "block",
-              width: "100%",
-              marginBottom: "10px",
-              padding: "8px",
-              borderRadius: "4px",
-              border: "1px solid purple",
-            }}
-          />
+          <h2>{lists[currentList].name} - Todos</h2>
+          <div>
+            <input
+              type="text"
+              value={todoItem}
+              onChange={(e) => setTodoItem(e.target.value)}
+              placeholder="Enter a todo item"
+              style={{
+                display: "block",
+                width: "100%",
+                marginBottom: "10px",
+                padding: "8px",
+                borderRadius: "4px",
+                border: "1px solid lightgreen",
+              }}
+            />
+            <button
+              onClick={handleAddTodo}
+              style={{
+                backgroundColor: "lightgreen",
+                padding: "10px",
+                borderRadius: "10px",
+                border: "1px solid transparent",
+                width: "100%",
+                cursor: "pointer",
+              }}
+            >
+              Add Todo
+            </button>
+          </div>
+
+          {/* Display the todo list */}
+          <div style={{ marginTop: "20px" }}>
+            {todoList.length === 0 ? (
+              <p>No todos available.</p>
+            ) : (
+              <ul>
+                {todoList.map((todo, index) => (
+                  <li key={index}>
+                    {editingTodoIndex === index ? (
+                      <>
+                        <input
+                          type="text"
+                          value={editTodoValue}
+                          onChange={(e) => setEditTodoValue(e.target.value)}
+                          style={{
+                            display: "inline-block",
+                            width: "80%",
+                            marginBottom: "5px",
+                            padding: "8px",
+                            borderRadius: "4px",
+                            border: "1px solid lightgreen",
+                          }}
+                        />
+                        <button
+                          onClick={handleSaveEdit}
+                          style={{
+                            backgroundColor: "lightgreen",
+                            padding: "5px",
+                            borderRadius: "4px",
+                            border: "1px solid transparent",
+                            marginLeft: "5px",
+                          }}
+                        >
+                          Save
+                        </button>
+                        <button
+                          onClick={handleCancelEdit}
+                          style={{
+                            backgroundColor: "red",
+                            padding: "5px",
+                            borderRadius: "4px",
+                            border: "1px solid transparent",
+                            marginLeft: "5px",
+                          }}
+                        >
+                          Cancel
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        {todo}
+                        <button
+                          onClick={() => handleEditTodo(index)}
+                          style={{
+                            marginLeft: "10px",
+                            padding: "5px",
+                            backgroundColor: "lightblue",
+                            borderRadius: "5px",
+                            cursor: "pointer",
+                          }}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleRemoveTodo(index)}
+                          style={{
+                            marginLeft: "10px",
+                            padding: "5px",
+                            backgroundColor: "red",
+                            color: "white",
+                            borderRadius: "5px",
+                            cursor: "pointer",
+                          }}
+                        >
+                          Remove
+                        </button>
+                      </>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
           <button
-            onClick={handleAddTodo}
+            onClick={() => setCurrentList(null)}
             style={{
-              padding: "10px",
-              backgroundColor: "#28a745",
+              marginTop: "10px",
+              backgroundColor: "grey",
               color: "white",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
-            }}
-          >
-            Add Todo
-          </button>
-
-          <h3>Todo Items:</h3>
-          {todoList.length === 0 ? (
-            <p>No todo items yet.</p>
-          ) : (
-            todoList.map((item, index) => (
-              <div
-                key={index}
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  marginBottom: "5px",
-                }}
-              >
-                {editingTodoIndex === index ? (
-                  <>
-                    <input
-                      type="text"
-                      value={editTodoValue}
-                      onChange={(e) => setEditTodoValue(e.target.value)}
-                      style={{
-                        width: "70%",
-                        padding: "5px",
-                        borderRadius: "4px",
-                        border: "1px solid purple",
-                      }}
-                    />
-                    <button
-                      onClick={handleSaveEdit}
-                      style={{
-                        marginLeft: "5px",
-                        backgroundColor: "#007bff",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "4px",
-                        cursor: "pointer",
-                      }}
-                    >
-                      Save
-                    </button>
-                    <button
-                      onClick={handleCancelEdit}
-                      style={{
-                        marginLeft: "5px",
-                        backgroundColor: "#dc3545",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "4px",
-                        cursor: "pointer",
-                      }}
-                    >
-                      Cancel
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <span>{item}</span>
-                    <div>
-                      <button
-                        onClick={() => handleEditTodo(index)}
-                        style={{
-                          marginLeft: "5px",
-                          backgroundColor: "#007bff",
-                          color: "white",
-                          border: "none",
-                          borderRadius: "4px",
-                          cursor: "pointer",
-                        }}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleRemoveTodo(index)}
-                        style={{
-                          marginLeft: "5px",
-                          backgroundColor: "#dc3545",
-                          color: "white",
-                          border: "none",
-                          borderRadius: "4px",
-                          cursor: "pointer",
-                        }}
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  </>
-                )}
-              </div>
-            ))
-          )}
-
-          <button
-            onClick={handleCancelEdit}
-            style={{
-              marginTop: "20px",
-              backgroundColor: "#ffc107",
-              color: "black",
-              border: "none",
-              borderRadius: "4px",
+              padding: "10px",
+              borderRadius: "10px",
+              border: "1px solid transparent",
+              width: "100%",
               cursor: "pointer",
             }}
           >
             Back to Lists
           </button>
-
-          <button
-            onClick={() => handleDeleteList(currentList)}
-            style={{
-              marginTop: "20px",
-              backgroundColor: "#dc3545",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
-            }}
-          >
-            Delete List
-          </button>
         </div>
       )}
-
-      {/* Display the shopping lists */}
-      <div style={{ marginTop: "20px" }}>
-      <h3 style={{ color: "white" }}>Your Shopping Lists:</h3>
-      <button
-        onClick={clearAllLists} // Add onClick to the Clear All button
-        style={{
-          padding: "20px",
-          backgroundColor: "red",
-          color: "white",
-          borderRadius: "10px",
-          border: "2px solid transparent",
-          cursor: "pointer",
-        }}
-      >
-        Clear All
-      </button>
-
-      {lists.length === 0 ? (
-        <p>No shopping lists available.</p>
-      ) : (
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)", // Four equal columns
-            gap: "10px", // Space between items
-            marginTop: "10px", // Added space above grid items
-          }}
-        >
-          {lists.map((list, index) => (
-            <div
-              key={index}
-              onClick={() => handleListClick(index)}
-              style={{
-                cursor: "pointer",
-                height: "100px",
-                width: "100px",
-                padding: "10px",
-                border: "2px solid orange",
-                borderRadius: "4px",
-                backgroundColor: "#f8f9fa",
-                textAlign: "center",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              {list.name} - {list.category}
-            </div>
-          ))}
-          {lists.map((list, index) => (
-            <button
-              key={index}
-              onClick={() => handleDeleteList(index)}
-              style={{
-                marginTop: "10px",
-                backgroundColor: "#dc3545",
-                color: "white",
-                border: "none",
-                borderRadius: "4px",
-                cursor: "pointer",
-                width: "100%", // Make button take full width of grid item
-                padding: "10px", // Added padding for better appearance
-              }}
-            >
-              Delete
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
- 
     </div>
   );
 }
 
 export default ShoppingList;
+
