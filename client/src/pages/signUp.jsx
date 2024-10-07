@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { registerUser } from './authSlice';
+// import { registerUser } from './authSlice';
 
 function SignUpForm() {
   const [username, setUsername] = useState('');
@@ -111,7 +111,7 @@ function SignUpForm() {
             color: '#007bff',
             textDecoration: 'none',
         },
-    }
+    
 };
 
 export default SignUpForm;

@@ -121,8 +121,8 @@ function ShoppingList() {
   };
 
   return (
-    <div className="container">
-      <h1 style={{ color: "white" }}>Shopping List</h1>
+    <div className="container" style={{backgroundSize:"cover",backgroundRepeat:"no-repeat",backgroundImage:`url(${require("../img/shopping-cart-with-neon-lights-it_81048-777.avif")})`}}>
+      <h1 style={{ color: "black" }}>Shopping List</h1>
       <button onClick={openModal} style={{ marginBottom: "20px" }}>
         Add New List
       </button>
@@ -359,7 +359,7 @@ function ShoppingList() {
 
       {/* Display the shopping lists */}
       <div style={{ marginTop: "20px" }}>
-        <h3 style={{color:"white"}}>Your Shopping Lists:</h3>
+        <h3 style={{color:"black"}}>Your Shopping Lists:</h3>
         {lists.length === 0 ? (
           <p>No shopping lists available.</p>
         ) : (

@@ -1,26 +1,46 @@
-// App.jsx
+import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Home from './pages/homePage';
-import SignIn from './pages/signIn';
-import SignUp from './components/signIn';
-import ShoppingList from './pages/shoppingList';
-import Nopage from './pages/noPage';
-import Layout from './pages/layout';
+import NavBar from './components/nav'
+import Home from './pages/homePage'; // Assuming LandingPage is in the same directory
+import SignUpForm from './pages/signUp';
+import SignUp from './pages/signUp'; // Import your SignUp component
+import ShoppingList from './pages/shoppingList'; // Import your ShoppingList component
+import NoPage from './pages/noPage'; // Import a component for non-existing routes
 
 function App() {
     return (
         <Router>
-            <Layout>
-                <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/signin" element={<SignIn />} />
-                    <Route path="/signup" element={<SignUp />} />
-                    <Route path="/shoppinglist" element={<ShoppingList />} />
-                    <Route path="*" element={<Nopage />} />
-                </Routes>
-            </Layout>
+            <div style={styles.appContainer}>
+                <NavBar />
+                <div style={styles.contentContainer}>
+                    <Routes>
+                        <Route path="/" element={<Home />} />
+                        <Route path="/signin" element={<SignUpForm />} />
+                        <Route path="/signup" element={<SignUp />} />
+                        <Route path="/shoppinglist" element={<ShoppingList />} />
+                        <Route path="*" element={<NoPage />} /> {/* Fallback for unmatched routes */}
+                    </Routes>
+                </div>
+            </div>
         </Router>
     );
 }
 
-export default App;
+const styles = {
+    appContainer: {
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100vh',
+    },
+    contentContainer: {
+        marginTop: '70px', // Adjust according to your NavBar height
+        flex: 1,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#f5f5f5',
+        padding: '20px',
+    },
+};
+
+export default App

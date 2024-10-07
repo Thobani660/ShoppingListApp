@@ -44,7 +44,7 @@ function Home(){
 const styles = {
 container: {
     fontFamily: 'Arial, sans-serif',
-    backgroundColor: 'transparent',
+    backgroundColor: 'red',
     color: '#333',
     textAlign: 'center',
     padding: '20px',
@@ -92,7 +92,7 @@ feature: {
     margin: '10px',
     backgroundColor: 'white',
     borderRadius: '8px',
-    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+    boxShadow: '0 2px 5px white',
 },
 testimonial: {
     margin: '40px 0',
