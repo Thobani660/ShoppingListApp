@@ -6,40 +6,40 @@ function SignInForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const dispatch = useDispatch();
-  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  // const dispatch = useDispatch();
+  // const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!email || !password) {
-      setError('Please fill in all fields');
-    } else {
-      dispatch(signInUser({ email, password }));
-      if (isAuthenticated) {
-        alert('Successfully signed in');
-      } else {
-        setError('Invalid email or password');
-      }
-    }
-  };
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   if (!email || !password) {
+  //     setError('Please fill in all fields');
+  //   } else {
+  //     dispatch(signInUser({ email, password }));
+  //     if (isAuthenticated) {
+  //       alert('Successfully signed in');
+  //     } else {
+  //       setError('Invalid email or password');
+  //     }
+  //   }
+  // };
 
   return (
     <div style={styles.container}>
       <h2 style={styles.header}>Sign In</h2>
-      {error && <p style={styles.error}>{error}</p>}
-      <form onSubmit={handleSubmit} style={styles.form}>
+      {/* {error && <p style={styles.error}>{error}</p>} */}
+      <form style={styles.form}>
         <input
           type="email"
           placeholder="Email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          // onChange={(e) => setEmail(e.target.value)}
           style={styles.input}
         />
         <input
           type="password"
           placeholder="Password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          // onChange={(e) => setPassword(e.target.value)}
           style={styles.input}
         />
         <button type="submit" style={styles.button}>
