@@ -9,18 +9,15 @@ function SignUpForm() {
   const [error, setError] = useState('');
   const dispatch = useDispatch();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!username || !email || !password) {
-      setError('Please fill in all fields');
-    } else {
-      setError('');
-      dispatch(registerUser({ username, email, password }))
-        .then(() => alert('Successfully registered'))
-        .catch(() => setError('Registration failed, please try again'));
-    }
-  };
-
+ 
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (!email || !password) {
+            setError('Please fill in all fields');
+        } else {
+            dispatch(registerUser({ email, password }));
+        }
+    };
   return (
     <div style={styles.container}>
       <h2 style={styles.header}>Sign Up</h2>

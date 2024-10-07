@@ -13,14 +13,7 @@ function ShoppingList() {
   const [editTodoValue, setEditTodoValue] = useState(""); // Track the value of the todo being edited
   const lists = useSelector((state) => state.shoppingList); // Access the Redux state
   const dispatch = useDispatch(); // Get the dispatch function
-  const [list, setList] = React.useState([]); // Assuming you are using state to manage your lists
 
-  // Function to clear all lists
-  const clearAllLists = () => {
-    dispatch({ type: 'shoppingList/clearAllLists' }); // Dispatch an action to clear all lists
-    showAlert("Cleared all shopping lists"); // Show alert
-    saveToLocalStorage(); // Update local storage
-  };
   // Load data from local storage
   useEffect(() => {
     const storedLists = JSON.parse(localStorage.getItem("shoppingLists"));
@@ -31,7 +24,7 @@ function ShoppingList() {
 
   // Save data to local storage
   const saveToLocalStorage = () => {
-    const listsToSave = lists.map((list, index) => ({
+    const listsToSave = lists.map((list) => ({
       ...list,
       todos: todoList, // Include the todo list in the saved data
     }));
@@ -50,16 +43,11 @@ function ShoppingList() {
     setCategory("Clothes");
   };
 
-  // Show alert message for button clicks
-  const showAlert = (message) => {
-    alert(message);
-  };
-
   // Handle form submission to add a new list
   const handleAddList = () => {
     if (listName) {
       dispatch(addList({ name: listName, category })); // Dispatch the action
-      showAlert("Added new list: " + listName); // Show alert
+      alert("Added new list: " + listName); // Show alert
       closeModal();
       saveToLocalStorage(); // Save to local storage
     }
@@ -69,7 +57,7 @@ function ShoppingList() {
   const handleAddTodo = () => {
     if (todoItem) {
       setTodoList((prev) => [...prev, todoItem]); // Add todo item to the list
-      showAlert("Added todo item: " + todoItem); // Show alert
+      alert("Added todo item: " + todoItem); // Show alert
       setTodoItem(""); // Reset input
       saveToLocalStorage(); // Save to local storage
     }
@@ -77,7 +65,7 @@ function ShoppingList() {
 
   // Handle removing a Todo item
   const handleRemoveTodo = (index) => {
-    showAlert("Removed todo item: " + todoList[index]); // Show alert
+    alert("Removed todo item: " + todoList[index]); // Show alert
     setTodoList((prev) => prev.filter((_, i) => i !== index)); // Remove todo item
     saveToLocalStorage(); // Save to local storage
   };
@@ -86,7 +74,7 @@ function ShoppingList() {
   const handleEditTodo = (index) => {
     setEditingTodoIndex(index);
     setEditTodoValue(todoList[index]); // Set the current value to the edit input
-    showAlert("Editing todo item: " + todoList[index]); // Show alert
+    alert("Editing todo item: " + todoList[index]); // Show alert
   };
 
   // Handle saving the edited Todo item
@@ -97,7 +85,7 @@ function ShoppingList() {
         newTodos[editingTodoIndex] = editTodoValue; // Update the edited todo item
         return newTodos;
       });
-      showAlert("Saved edit for todo item: " + editTodoValue); // Show alert
+      alert("Saved edit for todo item: " + editTodoValue); // Show alert
       setEditingTodoIndex(null); // Reset editing state
       setEditTodoValue(""); // Reset input
       saveToLocalStorage(); // Save to local storage
@@ -108,8 +96,6 @@ function ShoppingList() {
   const handleCancelEdit = () => {
     setEditingTodoIndex(null); // Reset editing state
     setEditTodoValue(""); // Reset input
-    setCurrentList(null); // Go back to list view
-    showAlert("Canceled editing todo item"); // Show alert
   };
 
   // Handle clicking a list card to edit the list
@@ -117,80 +103,150 @@ function ShoppingList() {
     setCurrentList(index);
     setTodoList([]); // Reset todo list for new selection
     setIsModalOpen(false); // Close list creation modal
-    showAlert("Viewing todo list: " + lists[index].name); // Show alert
+    alert("Viewing todo list: " + lists[index].name); // Show alert
   };
 
   // Handle deleting a shopping list
   const handleDeleteList = (index) => {
-    showAlert("Deleted shopping list: " + lists[index].name); // Show alert
+    alert("Deleted shopping list: " + lists[index].name); // Show alert
     dispatch(removeList(index)); // Dispatch the action to remove the list
     saveToLocalStorage(); // Save to local storage
   };
 
   return (
-    <div className="container" style={{backgroundSize:"cover",padding:"50px",borderRadius:"50px",backgroundRepeat:"no-repeat",backgroundImage:`url(${require("../img/shopping-cart-with-neon-lights-it_81048-777.avif")})`,width:"100%"}}>
-      <h1 style={{ color: "white" }}>Shopping List</h1>
-      <button onClick={openModal} style={{ marginBottom: "20px",backgroundColor:"lightgreen",padding:"20px",borderRadius:"15px",border:"2px solid white" }}>
+    <div
+      className="container"
+      style={{
+        backgroundSize: "cover",
+        padding: "50px",
+        borderRadius: "50px",
+        backgroundRepeat: "no-repeat",
+        backgroundImage: `url(${require("../img/shopping-cart-with-neon-lights-it_81048-777.avif")})`,
+        width: "100%",
+       // Apply blur effect
+      }}
+    >
+      <h1 style={{ color: "white", textAlign: "center", fontSize: "3rem" }}>Shopping List</h1>
+      <button
+        onClick={openModal}
+        style={{
+          marginBottom: "20px",
+          backgroundColor: "#4CAF50",
+          color: "white",
+          padding: "15px 30px",
+          borderRadius: "25px",
+          border: "none",
+          cursor: "pointer",
+          transition: "background-color 0.3s ease",
+        }}
+        onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#45a049")}
+        onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#4CAF50")}
+      >
         Add New List
       </button>
-      <input type="text" placeholder="Search" style={{ marginLeft: "620px",padding:"15px",width:"300px",borderRadius:"15px" }} />
+      <input
+        type="text"
+        placeholder="Search"
+        style={{
+          marginLeft: "auto",
+          marginRight: "auto",
+          display: "block",
+          padding: "15px",
+          width: "300px",
+          borderRadius: "15px",
+          border: "1px solid #ccc",
+          transition: "border 0.3s ease",
+        }}
+        onFocus={(e) => (e.currentTarget.style.border = "1px solid #4CAF50")}
+        onBlur={(e) => (e.currentTarget.style.border = "1px solid #ccc")}
+      />
 
-      {/* Apply blur effect to the background when modal is open */}
+      {/* Display the shopping lists */}
       <div style={{ filter: isModalOpen || currentList !== null ? "blur(5px)" : "none" }}>
-        {/* Display the shopping lists */}
-        <div style={{ marginTop: "20px" }}>
-          <h3 style={{ color: "white" }}>Your Shopping Lists:</h3>
-          <button
-            onClick={clearAllLists} // Add onClick to the Clear All button
+        <h3 style={{ color: "white", textAlign: "center" }}>Your Shopping Lists:</h3>
+        <button
+          onClick={() => {
+            dispatch({ type: "shoppingList/clearAllLists" });
+            alert("Cleared all shopping lists");
+            saveToLocalStorage();
+          }}
+          style={{
+            padding: "15px 30px",
+            backgroundColor: "red",
+            color: "white",
+            borderRadius: "25px",
+            border: "none",
+            cursor: "pointer",
+            transition: "background-color 0.3s ease",
+            marginBottom: "20px",
+            display: "block",
+            marginLeft: "auto",
+            marginRight: "auto",
+          }}
+          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#d32f2f")}
+          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "red")}
+        >
+          Clear All
+        </button>
+
+        {lists.length === 0 ? (
+          <p style={{ color: "white", textAlign: "center" }}>No shopping lists available.</p>
+        ) : (
+          <div
             style={{
-              padding: "20px",
-              backgroundColor: "red",
-              color: "white",
-              borderRadius: "10px",
-              border: "2px solid transparent",
-              cursor: "pointer",
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))",
+              gap: "15px",
+              marginTop: "10px",
+              padding: "0 20px",
             }}
           >
-            Clear All
-          </button>
-
-          {lists.length === 0 ? (
-            <p>No shopping lists available.</p>
-          ) : (
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(4, 1fr)", // Four equal columns
-                gap: "10px", // Space between items
-                marginTop: "10px", // Added space above grid items
-              }}
-            >
-              {lists.map((list, index) => (
-                <div
-                  key={index}
-                  onClick={() => handleListClick(index)}
-                  style={{
-                    cursor: "pointer",
-                    height: "100px",
-                    width: "100px",
-                    padding: "10px",
-                    border: "2px solid orange",
-                    borderRadius: "4px",
-                    backgroundColor: "#f8f9fa",
-                    textAlign: "center",
-                    justifyContent: "center",
-                    alignItems: "center",
+            {lists.map((list, index) => (
+              <div
+                key={index}
+                onClick={() => handleListClick(index)}
+                style={{
+                  cursor: "pointer",
+                  height: "100px",
+                  padding: "10px",
+                  border: "2px solid #FFA500",
+                  borderRadius: "15px",
+                  backgroundColor: "#f8f9fa",
+                  textAlign: "center",
+                  transition: "transform 0.3s ease",
+                }}
+                onMouseOver={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+                onMouseOut={(e) => (e.currentTarget.style.transform = "scale(1)")}
+              >
+                <h4 style={{ margin: 0, color: "#FFA500" }}>{list.name}</h4>
+                <p style={{ margin: 0 }}>{list.category}</p>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteList(index);
                   }}
+                  style={{
+                    marginTop: "10px",
+                    backgroundColor: "red",
+                    color: "white",
+                    borderRadius: "10px",
+                    border: "none",
+                    padding: "5px",
+                    cursor: "pointer",
+                    transition: "background-color 0.3s ease",
+                  }}
+                  onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#d32f2f")}
+                  onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "red")}
                 >
-                  {list.name} - {list.category}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+                  Delete
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Modal for Adding New List */}
+      {/* Modal for adding new shopping lists */}
       {isModalOpen && (
         <div
           style={{
@@ -200,17 +256,17 @@ function ShoppingList() {
             transform: "translate(-50%, -50%)",
             padding: "20px",
             backgroundColor: "white",
-            borderRadius: "8px",
-            boxShadow: "0.5px 0.5px 3px 2px grey",
+            borderRadius: "15px",
+            boxShadow: "0 5px 15px rgba(0, 0, 0, 0.3)",
             zIndex: 1000,
           }}
         >
-          <h2>Create New List</h2>
+          <h2 style={{ color: "#333" }}>Create New Shopping List</h2>
           <input
             type="text"
-            placeholder="List Name"
             value={listName}
             onChange={(e) => setListName(e.target.value)}
+            placeholder="Enter list name"
             style={{
               display: "block",
               width: "100%",
@@ -246,7 +302,10 @@ function ShoppingList() {
               border: "1px solid transparent",
               width: "100%",
               cursor: "pointer",
+              transition: "background-color 0.3s ease",
             }}
+            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "lightgreen")}
+            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "lightgreen")}
           >
             Add List
           </button>
@@ -261,7 +320,10 @@ function ShoppingList() {
               border: "1px solid transparent",
               width: "100%",
               cursor: "pointer",
+              transition: "background-color 0.3s ease",
             }}
+            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#d32f2f")}
+            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "red")}
           >
             Cancel
           </button>
@@ -278,12 +340,12 @@ function ShoppingList() {
             transform: "translate(-50%, -50%)",
             padding: "20px",
             backgroundColor: "white",
-            borderRadius: "8px",
-            boxShadow: "0.5px 0.5px 3px 2px grey",
+            borderRadius: "15px",
+            boxShadow: "0 5px 15px rgba(0, 0, 0, 0.3)",
             zIndex: 1000,
           }}
         >
-          <h2>{lists[currentList].name} - Todos</h2>
+          <h2 style={{ color: "#333" }}>{lists[currentList].name} - Todos</h2>
           <div>
             <input
               type="text"
@@ -308,7 +370,10 @@ function ShoppingList() {
                 border: "1px solid transparent",
                 width: "100%",
                 cursor: "pointer",
+                transition: "background-color 0.3s ease",
               }}
+              onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "lightgreen")}
+              onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "lightgreen")}
             >
               Add Todo
             </button>
@@ -319,9 +384,9 @@ function ShoppingList() {
             {todoList.length === 0 ? (
               <p>No todos available.</p>
             ) : (
-              <ul>
+              <ul style={{ padding: 0 }}>
                 {todoList.map((todo, index) => (
-                  <li key={index}>
+                  <li key={index} style={{ listStyle: "none", marginBottom: "10px" }}>
                     {editingTodoIndex === index ? (
                       <>
                         <input
@@ -345,7 +410,11 @@ function ShoppingList() {
                             borderRadius: "4px",
                             border: "1px solid transparent",
                             marginLeft: "5px",
+                            cursor: "pointer",
+                            transition: "background-color 0.3s ease",
                           }}
+                          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "lightgreen")}
+                          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "lightgreen")}
                         >
                           Save
                         </button>
@@ -357,14 +426,18 @@ function ShoppingList() {
                             borderRadius: "4px",
                             border: "1px solid transparent",
                             marginLeft: "5px",
+                            cursor: "pointer",
+                            transition: "background-color 0.3s ease",
                           }}
+                          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#d32f2f")}
+                          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "red")}
                         >
                           Cancel
                         </button>
                       </>
                     ) : (
                       <>
-                        {todo}
+                        <span>{todo}</span>
                         <button
                           onClick={() => handleEditTodo(index)}
                           style={{
@@ -373,7 +446,10 @@ function ShoppingList() {
                             backgroundColor: "lightblue",
                             borderRadius: "5px",
                             cursor: "pointer",
+                            transition: "background-color 0.3s ease",
                           }}
+                          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#3b99db")}
+                          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "lightblue")}
                         >
                           Edit
                         </button>
@@ -386,7 +462,10 @@ function ShoppingList() {
                             color: "white",
                             borderRadius: "5px",
                             cursor: "pointer",
+                            transition: "background-color 0.3s ease",
                           }}
+                          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#d32f2f")}
+                          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "red")}
                         >
                           Remove
                         </button>
@@ -409,7 +488,10 @@ function ShoppingList() {
               border: "1px solid transparent",
               width: "100%",
               cursor: "pointer",
+              transition: "background-color 0.3s ease",
             }}
+            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#555")}
+            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "grey")}
           >
             Back to Lists
           </button>
@@ -420,4 +502,3 @@ function ShoppingList() {
 }
 
 export default ShoppingList;
-
