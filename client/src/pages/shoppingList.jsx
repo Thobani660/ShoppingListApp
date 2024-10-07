@@ -13,7 +13,12 @@ function ShoppingList() {
   const [editTodoValue, setEditTodoValue] = useState(""); // Track the value of the todo being edited
   const lists = useSelector((state) => state.shoppingList); // Access the Redux state
   const dispatch = useDispatch(); // Get the dispatch function
+  const [list, setList] = React.useState([]); // Assuming you are using state to manage your lists
 
+  // Function to clear all lists
+  const clearAllLists = () => {
+    setList([]); // Sets the lists to an empty array, effectively clearing them
+  };
   // Load data from local storage
   useEffect(() => {
     const storedLists = JSON.parse(localStorage.getItem("shoppingLists"));
@@ -121,12 +126,12 @@ function ShoppingList() {
   };
 
   return (
-    <div className="container" style={{backgroundSize:"cover",backgroundRepeat:"no-repeat",backgroundImage:`url(${require("../img/shopping-cart-with-neon-lights-it_81048-777.avif")})`}}>
-      <h1 style={{ color: "black" }}>Shopping List</h1>
-      <button onClick={openModal} style={{ marginBottom: "20px" }}>
+    <div className="container" style={{backgroundSize:"cover",padding:"50px",borderRadius:"50px",backgroundRepeat:"no-repeat",backgroundImage:`url(${require("../img/shopping-cart-with-neon-lights-it_81048-777.avif")})`,width:"100%"}}>
+      <h1 style={{ color: "white" }}>Shopping List</h1>
+      <button onClick={openModal} style={{ marginBottom: "20px",backgroundColor:"lightgreen",padding:"20px",borderRadius:"15px",border:"2px solid white" }}>
         Add New List
       </button>
-      <input type="text" placeholder="Search" style={{ marginLeft: "100px" }} />
+      <input type="text" placeholder="Search" style={{ marginLeft: "620px",padding:"15px",width:"300px",borderRadius:"15px" }} />
 
       {/* Modal for Adding New List */}
       {isModalOpen && (
@@ -359,48 +364,74 @@ function ShoppingList() {
 
       {/* Display the shopping lists */}
       <div style={{ marginTop: "20px" }}>
-        <h3 style={{color:"black"}}>Your Shopping Lists:</h3>
-        {lists.length === 0 ? (
-          <p>No shopping lists available.</p>
-        ) : (
-          lists.map((list, index) => (
+      <h3 style={{ color: "white" }}>Your Shopping Lists:</h3>
+      <button
+        onClick={clearAllLists} // Add onClick to the Clear All button
+        style={{
+          padding: "20px",
+          backgroundColor: "red",
+          color: "white",
+          borderRadius: "10px",
+          border: "2px solid transparent",
+          cursor: "pointer",
+        }}
+      >
+        Clear All
+      </button>
+
+      {lists.length === 0 ? (
+        <p>No shopping lists available.</p>
+      ) : (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(4, 1fr)", // Four equal columns
+            gap: "10px", // Space between items
+            marginTop: "10px", // Added space above grid items
+          }}
+        >
+          {lists.map((list, index) => (
             <div
               key={index}
+              onClick={() => handleListClick(index)}
               style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginBottom: "10px",
+                cursor: "pointer",
+                height: "100px",
+                width: "100px",
+                padding: "10px",
+                border: "2px solid orange",
+                borderRadius: "4px",
+                backgroundColor: "#f8f9fa",
+                textAlign: "center",
+                justifyContent: "center",
+                alignItems: "center",
               }}
             >
-              <div
-                onClick={() => handleListClick(index)}
-                style={{
-                  cursor: "pointer",
-                  padding: "10px",
-                  border: "1px solid purple",
-                  borderRadius: "4px",
-                  backgroundColor: "#f8f9fa",
-                }}
-              >
-                {list.name} - {list.category}
-              </div>
-              <button
-                onClick={() => handleDeleteList(index)}
-                style={{
-                  marginLeft: "10px",
-                  backgroundColor: "#dc3545",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "4px",
-                  cursor: "pointer",
-                }}
-              >
-                Delete
-              </button>
+              {list.name} - {list.category}
             </div>
-          ))
-        )}
-      </div>
+          ))}
+          {lists.map((list, index) => (
+            <button
+              key={index}
+              onClick={() => handleDeleteList(index)}
+              style={{
+                marginTop: "10px",
+                backgroundColor: "#dc3545",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+                width: "100%", // Make button take full width of grid item
+                padding: "10px", // Added padding for better appearance
+              }}
+            >
+              Delete
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+ 
     </div>
   );
 }
