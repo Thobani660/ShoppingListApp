@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addList, removeList } from "../feature/shoppingList/shoppingListSlice"; // Import the actions
+import {
+  addList,
+  removeList,
+  addTodo,
+  removeTodo,
+  editTodo,
+  clearAllLists,
+} from "../feature/shoppingList/shoppingListSlice"; // Import the actions
 
 function ShoppingList() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -8,7 +15,6 @@ function ShoppingList() {
   const [category, setCategory] = useState("Clothes");
   const [currentList, setCurrentList] = useState(null); // Track the current list being edited
   const [todoItem, setTodoItem] = useState(""); // Track todo item input
-  const [todoList, setTodoList] = useState([]); // Store todos for the selected list
   const [editingTodoIndex, setEditingTodoIndex] = useState(null); // Track which todo item is being edited
   const [editTodoValue, setEditTodoValue] = useState(""); // Track the value of the todo being edited
   const lists = useSelector((state) => state.shoppingList); // Access the Redux state
@@ -22,15 +28,10 @@ function ShoppingList() {
     }
   }, [dispatch]);
 
-  // Save data to local storage
-  const saveToLocalStorage = () => {
-    const listsToSave = lists.map((list) => ({
-      ...list,
-      todos: todoList, // Include the todo list in the saved data
-    }));
-    localStorage.setItem("shoppingLists", JSON.stringify(listsToSave));
-  };
-
+    // Save data to local storage
+    const saveToLocalStorage = () => {
+      localStorage.setItem("shoppingLists", JSON.stringify(lists));
+    };
   // Open the modal
   const openModal = () => {
     setIsModalOpen(true);
@@ -49,46 +50,38 @@ function ShoppingList() {
       dispatch(addList({ name: listName, category })); // Dispatch the action
       alert("Added new list: " + listName); // Show alert
       closeModal();
-      saveToLocalStorage(); // Save to local storage
     }
   };
 
   // Handle adding a Todo item
   const handleAddTodo = () => {
     if (todoItem) {
-      setTodoList((prev) => [...prev, todoItem]); // Add todo item to the list
-      alert("Added todo item: " + todoItem); // Show alert
+      dispatch(addTodo({ listIndex: currentList, todo: todoItem }));
       setTodoItem(""); // Reset input
-      saveToLocalStorage(); // Save to local storage
     }
   };
 
   // Handle removing a Todo item
-  const handleRemoveTodo = (index) => {
-    alert("Removed todo item: " + todoList[index]); // Show alert
-    setTodoList((prev) => prev.filter((_, i) => i !== index)); // Remove todo item
-    saveToLocalStorage(); // Save to local storage
+  const handleRemoveTodo = (todoIndex) => {
+    dispatch(removeTodo({ listIndex: currentList, todoIndex }));
   };
 
   // Handle starting to edit a Todo item
-  const handleEditTodo = (index) => {
-    setEditingTodoIndex(index);
-    setEditTodoValue(todoList[index]); // Set the current value to the edit input
-    alert("Editing todo item: " + todoList[index]); // Show alert
+  const handleEditTodo = (todoIndex) => {
+    setEditingTodoIndex(todoIndex);
+    setEditTodoValue(lists[currentList].todos[todoIndex]); // Set the current value to the edit input
   };
 
   // Handle saving the edited Todo item
   const handleSaveEdit = () => {
     if (editTodoValue) {
-      setTodoList((prev) => {
-        const newTodos = [...prev];
-        newTodos[editingTodoIndex] = editTodoValue; // Update the edited todo item
-        return newTodos;
-      });
-      alert("Saved edit for todo item: " + editTodoValue); // Show alert
+      dispatch(editTodo({
+        listIndex: currentList,
+        todoIndex: editingTodoIndex,
+        newTodo: editTodoValue,
+      }));
       setEditingTodoIndex(null); // Reset editing state
       setEditTodoValue(""); // Reset input
-      saveToLocalStorage(); // Save to local storage
     }
   };
 
@@ -101,16 +94,11 @@ function ShoppingList() {
   // Handle clicking a list card to edit the list
   const handleListClick = (index) => {
     setCurrentList(index);
-    setTodoList([]); // Reset todo list for new selection
-    setIsModalOpen(false); // Close list creation modal
-    alert("Viewing todo list: " + lists[index].name); // Show alert
   };
 
   // Handle deleting a shopping list
   const handleDeleteList = (index) => {
-    alert("Deleted shopping list: " + lists[index].name); // Show alert
     dispatch(removeList(index)); // Dispatch the action to remove the list
-    saveToLocalStorage(); // Save to local storage
   };
 
   return (
@@ -162,7 +150,7 @@ function ShoppingList() {
       />
 
       {/* Display the shopping lists */}
-      <div style={{ filter: isModalOpen || currentList !== null ? "blur(5px)" : "none" }}>
+      <div style={{ filter: isModalOpen || currentList !== null ? "blur(10px)" : "none" }}>
         <h3 style={{ color: "white", textAlign: "center" }}>Your Shopping Lists:</h3>
         <button
           onClick={() => {
@@ -201,47 +189,47 @@ function ShoppingList() {
               padding: "0 20px",
             }}
           >
-            {lists.map((list, index) => (
-              <div
-                key={index}
-                onClick={() => handleListClick(index)}
-                style={{
-                  cursor: "pointer",
-                  height: "100px",
-                  padding: "10px",
-                  border: "2px solid #FFA500",
-                  borderRadius: "15px",
-                  backgroundColor: "#f8f9fa",
-                  textAlign: "center",
-                  transition: "transform 0.3s ease",
-                }}
-                onMouseOver={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
-                onMouseOut={(e) => (e.currentTarget.style.transform = "scale(1)")}
-              >
-                <h4 style={{ margin: 0, color: "#FFA500" }}>{list.name}</h4>
-                <p style={{ margin: 0 }}>{list.category}</p>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDeleteList(index);
-                  }}
-                  style={{
-                    marginTop: "10px",
-                    backgroundColor: "red",
-                    color: "white",
-                    borderRadius: "10px",
-                    border: "none",
-                    padding: "5px",
-                    cursor: "pointer",
-                    transition: "background-color 0.3s ease",
-                  }}
-                  onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#d32f2f")}
-                  onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "red")}
-                >
-                  Delete
-                </button>
-              </div>
-            ))}
+        {lists.map((list, index) => (
+  <div
+    key={index}
+    onClick={() => handleListClick(index)}
+    style={{
+      cursor: "pointer",
+      height: "100px",
+      padding: "10px",
+      border: "2px solid #FFA500",
+      borderRadius: "15px",
+      backgroundColor: "#f8f9fa",
+      textAlign: "center",
+      transition: "transform 0.3s ease",
+    }}
+    onMouseOver={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+    onMouseOut={(e) => (e.currentTarget.style.transform = "scale(1)")}
+  >
+    <h4 style={{ margin: 0, color: "#FFA500" }}>{list.name}</h4>
+    <p style={{ margin: 0 }}>{list.category}</p>
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        handleDeleteList(index);
+      }}
+      style={{
+        marginTop: "10px",
+        backgroundColor: "red",
+        color: "white",
+        borderRadius: "10px",
+        border: "none",
+        padding: "5px",
+        cursor: "pointer",
+        transition: "background-color 0.3s ease",
+      }}
+      onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#d32f2f")}
+      onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "red")}
+    >
+      Delete
+    </button>
+  </div>
+))}
           </div>
         )}
       </div>
